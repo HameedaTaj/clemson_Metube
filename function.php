@@ -3,7 +3,7 @@
 function connect(){
 	include 'config.php';
 	$link = mysqli_connect($db_host, $db_user, $db_password, $db_database);
-	
+
 	if(!$link){
 		die("Failed to connect to MySQL: " . mysqli_connect_error());
 	}
@@ -33,7 +33,7 @@ function registrationValidation($username, $password, $first_name, $last_name, $
 			return false;
 		}
 		elseif($count2!=0){
-			echo "<h3>EMail already registered. Try Login instead</h3>";
+			echo "<h3>E-mail already registered. Try Login instead</h3>";
 			return false;
 		}
 		elseif($count3 != 0){
@@ -41,7 +41,7 @@ function registrationValidation($username, $password, $first_name, $last_name, $
 			return false;
 		}
 		else{
-			$query3 = "INSERT INTO user VALUES (default, '$username', 'password','$first_name', 
+			$query3 = "INSERT INTO user VALUES (default, '$username', 'password','$first_name',
 							'$last_name','$dob', '$sex', '$email', '$phone')";
 			$result3 = mysqli_query ($conn, $query3);
 			if(!$result3){
@@ -60,7 +60,7 @@ function registrationValidation($username, $password, $first_name, $last_name, $
 
 function userValidation($credential, $password){
 	$conn = connect();
-	$query = "SELECT * FROM user WHERE user_name = '$credential' 
+	$query = "SELECT * FROM user WHERE user_name = '$credential'
 				or email = '$credential' or phone = '$credential'";
 	$result = mysqli_query($conn, $query);
 	if (!$result){
@@ -68,16 +68,16 @@ function userValidation($credential, $password){
 	}
 	else{
 		$value = mysqli_fetch_row ($result);
-		if($value[2] != $password){
+		if($value[3] != $password){
 			return false;
 		}
 		else{
 			$_SESSION['id'] = $value[0];
 			return true;
-		}			
+		}
 	}
 	mysqli_free_result($result);
-	mysqli_close($conn);	
+	mysqli_close($conn);
 }
 
 function guest(){
@@ -93,12 +93,12 @@ function guest(){
 		return $value[1];
 	}
 	mysqli_free_result($result);
-	mysqli_close($conn);	
+	mysqli_close($conn);
 }
 
 function forgotPassword($credential){
 	$conn = connect();
-	$query = "SELECT password, email FROM user WHERE user_name = '$credential' 
+	$query = "SELECT password, email FROM user WHERE user_name = '$credential'
 				or email = '$credential' or phone = '$credential'";
 	$result = mysqli_query($conn, $query);
 	if (!$result){
@@ -135,8 +135,10 @@ function getUserName($userid){
 		die ("Query Failed: ".mysqli_error($conn));
 	}
 	else{
-		$value = mysqli_fetch_object($result);
+		$value=array();
+		while($value = mysqli_fetch_object($result)){
 		return $value->name;
+		}
 	}
 	mysqli_free_result($result);
 	mysqli_close($conn);
@@ -259,13 +261,13 @@ function accountDelete($userid){
 
 function allUsers($userid){
 	$conn = connect();
-	$query = "SELECT user_name FROM user WHERE user_id != $userid 
+	$query = "SELECT user_name FROM user WHERE user_id != $userid
 				and user_id NOT IN (SELECT user_id FROM user WHERE user_id = 1)
-				and user_id NOT IN (SELECT user_id1 from blocked where user_id2 = '$userid')				
+				and user_id NOT IN (SELECT user_id1 from blocked where user_id2 = '$userid')
 				and user_id NOT IN (SELECT user_id2 from blocked where user_id1 = '$userid')
-				and user_id NOT IN (SELECT user_id2 from contacts where user_id1 = '$userid')	
+				and user_id NOT IN (SELECT user_id2 from contacts where user_id1 = '$userid')
 				and user_id NOT IN (SELECT user_id2 from friends where user_id1 = '$userid')
-				ORDER BY user_id";	
+				ORDER BY user_id";
 	$result = mysqli_query($conn,$query);
 	if(!$result){
 		die("Query Failed: ".mysqli_error($conn));
@@ -279,7 +281,7 @@ function allUsers($userid){
 
 function myContacts($userid){
 	$conn = connect();
-	$query = "SELECT user_name FROM user WHERE user_id IN 
+	$query = "SELECT user_name FROM user WHERE user_id IN
 				(SELECT user_id2 from contacts WHERE user_id1 = $userid) ORDER BY user_id";
 	$result = mysqli_query($conn,$query);
 	if(!$result){
@@ -294,7 +296,7 @@ function myContacts($userid){
 
 function myFriends($userid){
 	$conn = connect();
-	$query = "SELECT user_name FROM user WHERE user_id IN 
+	$query = "SELECT user_name FROM user WHERE user_id IN
 				(SELECT user_id2 from friends WHERE user_id1 = $userid) ORDER BY user_id";
 	$result = mysqli_query($conn,$query);
 	if(!$result){
@@ -309,7 +311,7 @@ function myFriends($userid){
 
 function myBlockedContact($userid){
 	$conn = connect();
-	$query = "SELECT user_name FROM user WHERE user_id IN 
+	$query = "SELECT user_name FROM user WHERE user_id IN
 				(SELECT user_id2 from blocked WHERE user_id1 = $userid) ORDER BY user_id";
 	$result = mysqli_query($conn,$query);
 	if(!$result){
@@ -406,7 +408,7 @@ function removeBlock($userid1, $userid2){
 	mysqli_close($conn);
 }
 
-function mediaUpload ($userid, $title, $description, $category, $keywords, $filename, $extension, $shareAccess, $downloadAccess, $ratingAccess, $discussionAccess, $path, $channelid){	
+function mediaUpload ($userid, $title, $description, $category, $keywords, $filename, $extension, $shareAccess, $downloadAccess, $ratingAccess, $discussionAccess, $path, $channelid){
 	$conn = connect();
 	$query = "INSERT INTO media VALUES (default, $userid, '$title', '$description', $category, '$keywords', '$filename', '$extension', $shareAccess, $downloadAccess, $ratingAccess, $discussionAccess, '$path', CURRENT_TIMESTAMP, $channelid)";
 	$result = mysqli_query($conn, $query);
@@ -440,7 +442,7 @@ function friendCheck ($userid){
 	mysqli_close($conn);
 }
 
-function mediaDetails($mediaId){	
+function mediaDetails($mediaId){
 	$conn = connect();
 	$query = "SELECT * FROM media WHERE media_id = $mediaId";
 	$result = mysqli_query($conn, $query);
@@ -454,23 +456,23 @@ function mediaDetails($mediaId){
 	mysqli_close($conn);
 }
 
-function getMedia($userid){	
+function getMedia($userid){
 	$conn = connect();
 	$username = getUserName($userid);
-	$query1 = "SELECT * FROM usermedia_$username WHERE 
+	$query1 = "SELECT * FROM usermedia_$username WHERE
 				media_id NOT IN (SELECT media_id FROM blockedmedia WHERE user_id = $userid)";
 	$result1 = mysqli_query($conn, $query1);
 	if(!$result1){
 		$query2 = "CREATE VIEW usermedia_$username AS
-				(SELECT * from media where file_share_access = '1' or user_id = $userid) 
-				UNION 
+				(SELECT * from media where file_share_access = '1' or user_id = $userid)
+				UNION
 				(SELECT * FROM media WHERE user_id IN (SELECT user_id2 from friends where user_id1 = $userid) and file_share_access = 2)";
 		$result2 = mysqli_query($conn, $query2);
 		if(!$result2){
 			die ("Query Failed: ".mysqli_error($conn));
 		}
 		else{
-			$query3 = "SELECT * FROM usermedia_$username WHERE 
+			$query3 = "SELECT * FROM usermedia_$username WHERE
 						media_id NOT IN (SELECT media_id FROM blockedmedia WHERE user_id = $userid)";
 			$result3 = mysqli_query($conn, $query3);
 			if(!$result3){
@@ -490,7 +492,7 @@ function getMedia($userid){
 	mysqli_close($conn);
 }
 
-function getImages($userid){	
+function getImages($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT * FROM usermedia_$username WHERE category = 1
@@ -506,10 +508,10 @@ function getImages($userid){
 	mysqli_close($conn);
 }
 
-function getAudios($userid){	
+function getAudios($userid){
 	$conn = connect();
 	$username = getUserName($userid);
-	$query = "SELECT * FROM usermedia_$username WHERE category = 2 
+	$query = "SELECT * FROM usermedia_$username WHERE category = 2
 				AND media_id NOT IN (SELECT media_id FROM blockedmedia WHERE user_id = $userid)";
 	$result = mysqli_query($conn, $query);
 	if(!$result){
@@ -522,7 +524,7 @@ function getAudios($userid){
 	mysqli_close($conn);
 }
 
-function getGraphics($userid){	
+function getGraphics($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT * FROM usermedia_$username WHERE category = 3
@@ -538,10 +540,10 @@ function getGraphics($userid){
 	mysqli_close($conn);
 }
 
-function getShows($userid){	
+function getShows($userid){
 	$conn = connect();
 	$username = getUserName($userid);
-	$query = "SELECT * FROM usermedia_$username WHERE category = 4	
+	$query = "SELECT * FROM usermedia_$username WHERE category = 4
 				AND media_id NOT IN (SELECT media_id FROM blockedmedia WHERE user_id = $userid)";
 	$result = mysqli_query($conn, $query);
 	if(!$result){
@@ -554,7 +556,7 @@ function getShows($userid){
 	mysqli_close($conn);
 }
 
-function getMovies($userid){	
+function getMovies($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT * FROM usermedia_$username WHERE category = 5
@@ -570,7 +572,7 @@ function getMovies($userid){
 	mysqli_close($conn);
 }
 
-function getSports($userid){	
+function getSports($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT * FROM usermedia_$username WHERE category = 6
@@ -586,7 +588,7 @@ function getSports($userid){
 	mysqli_close($conn);
 }
 
-function getNews($userid){	
+function getNews($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT * FROM usermedia_$username WHERE category = 7
@@ -602,7 +604,7 @@ function getNews($userid){
 	mysqli_close($conn);
 }
 
-function getOthers($userid){	
+function getOthers($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT * FROM usermedia_$username WHERE category = 8
@@ -650,7 +652,7 @@ function addView($mediaid){
 		die ("Query Failed: ".mysqli_error($conn));
 		}
 	}
-	else {		
+	else {
 		$query3 = "SELECT viewcount FROM mediaview WHERE media_id = $mediaid";
 		$result3 = mysqli_query($conn, $query3);
 		if(!$result){
@@ -678,8 +680,10 @@ function ratingAccess($userid, $mediaid){
 		die ("Query Failed: ".mysqli_error($conn));
 	}
 	else{
-		$value = mysqli_fetch_object($result);
+		$value = array(); 
+		while($value = mysqli_fetch_object($result)){
 		return $value->rating;
+		}
 	}
 }
 
@@ -692,8 +696,10 @@ function discussionAccess($userid, $mediaid){
 		die ("Query Failed: ".mysqli_error($conn));
 	}
 	else{
-		$value = mysqli_fetch_object($result);
+		$value = array();
+		while($value = mysqli_fetch_object($result)){
 		return $value->discussion;
+		}
 	}
 }
 
@@ -706,8 +712,10 @@ function downloadAccess($userid, $mediaid){
 		die ("Query Failed: ".mysqli_error($conn));
 	}
 	else{
-		$value = mysqli_fetch_object($result);
+		$value = array();
+		while($value = mysqli_fetch_object($result)){
 		return $value->download;
+		}
 	}
 }
 
@@ -749,7 +757,7 @@ function getRating($mediaid){
 		else{
 			$value = mysqli_fetch_object($result);
 			return $value->currentRating;
-		}		
+		}
 	}
 }
 
@@ -761,7 +769,7 @@ function getComment($mediaid){
 		die ("Query Failed: ".mysqli_error($conn));
 	}
 	else{
-		return $result;	
+		return $result;
 	}
 }
 
@@ -923,9 +931,9 @@ function createSubscription($channelid, $userid){
 
 function mySubscription($userId){
 	$conn = connect();
-	$query = "SELECT s.channel_id, c.channel_name, c.channel_description, c.user_id, c.created_date, 			s.subscribed_date 
+	$query = "SELECT s.channel_id, c.channel_name, c.channel_description, c.user_id, c.created_date, 			s.subscribed_date
 				FROM channel c
-				INNER JOIN subscriptions s 
+				INNER JOIN subscriptions s
 				ON c.channel_id = s.channel_id
 				WHERE s.user_id = $userId";
 	$result = mysqli_query($conn, $query);
@@ -1040,12 +1048,12 @@ function blockMedia($mediaid, $userid){
 	mysqli_close($conn);
 }
 
-function getFavourites($userid){	
+function getFavourites($userid){
 	$conn = connect();
 	$query = "SELECT f.media_id, m.title, m.user_id, m.file_path, m.upload_date,
-				m.description, m.category, m.channel_id 
+				m.description, m.category, m.channel_id
 				FROM favourites f
-				INNER JOIN media m 
+				INNER JOIN media m
 				ON m.media_id = f.media_id
 				WHERE f.user_id = $userid ";
 	$result = mysqli_query($conn, $query);
@@ -1059,12 +1067,12 @@ function getFavourites($userid){
 	mysqli_close($conn);
 }
 
-function getBlockedMedia($userid){	
+function getBlockedMedia($userid){
 	$conn = connect();
 	$query = "SELECT f.media_id, m.title, m.user_id, m.file_path, m.upload_date,
-				m.description, m.category, m.channel_id 
+				m.description, m.category, m.channel_id
 				FROM blockedmedia f
-				INNER JOIN media m 
+				INNER JOIN media m
 				ON m.media_id = f.media_id
 				WHERE f.user_id = $userid ";
 	$result = mysqli_query($conn, $query);
@@ -1106,13 +1114,13 @@ function deleteBlock($mediaid, $userid){
 	mysqli_close($conn);
 }
 
-function getMostViewed($userid){	
+function getMostViewed($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT v.media_id, m.title, m.user_id, m.file_path, m.upload_date,
-				m.description, m.category, m.channel_id 
+				m.description, m.category, m.channel_id
 				FROM mediaview v
-				INNER JOIN usermedia_$username m 
+				INNER JOIN usermedia_$username m
 				ON m.media_id = v.media_id
 				ORDER BY v.viewcount desc";
 	$result = mysqli_query($conn, $query);
@@ -1126,7 +1134,7 @@ function getMostViewed($userid){
 	mysqli_close($conn);
 }
 
-function getRecentlyUploaded($userid){	
+function getRecentlyUploaded($userid){
 	$conn = connect();
 	$username = getUserName($userid);
 	$query = "SELECT * FROM usermedia_$username ORDER BY upload_date desc";
@@ -1158,22 +1166,22 @@ function deleteComment($comment, $userid){
 function search($key, $userid){
 	$conn = connect();
 	$username = getUserName($userid);
-	
+
 	$query1 = "SELECT media_id FROM usermedia_$username WHERE title LIKE '%$key%'";
-	$result1 = mysqli_query($conn, $query1);	
+	$result1 = mysqli_query($conn, $query1);
 	if(!$result1){
 		die ("Query1 Failed: ".mysqli_error($conn));
 	}
 	else{
 		if(mysqli_num_rows($result1) != 0){
 			while($row = mysqli_fetch_object($result1)){
-				$mediaId[] = $row->media_id;			
+				$mediaId[] = $row->media_id;
 			}
 		}
 	}
-	
+
 	$query2 = "SELECT media_id FROM usermedia_$username WHERE description LIKE '%$key%'";
-	$result2 = mysqli_query($conn, $query2);	
+	$result2 = mysqli_query($conn, $query2);
 	if(!$result2){
 		die ("Query2 Failed: ".mysqli_error($conn));
 	}
@@ -1184,9 +1192,9 @@ function search($key, $userid){
 			}
 		}
 	}
-	
+
 	$query3 = "SELECT media_id FROM usermedia_$username WHERE file_extension LIKE '%$key%'";
-	$result3 = mysqli_query($conn, $query3);	
+	$result3 = mysqli_query($conn, $query3);
 	if(!$result3){
 		die ("Query3 Failed: ".mysqli_error($conn));
 	}
@@ -1198,9 +1206,9 @@ function search($key, $userid){
 		}
 	}
 
-	$query4 = "SELECT media_id FROM usermedia_$username WHERE channel_id IN 
+	$query4 = "SELECT media_id FROM usermedia_$username WHERE channel_id IN
 				(SELECT channel_id FROM channel WHERE channel_name LIKE '%$key%')";
-	$result4 = mysqli_query($conn, $query4);	
+	$result4 = mysqli_query($conn, $query4);
 	if(!$result4){
 		die ("Query4 Failed: ".mysqli_error($conn));
 	}
@@ -1211,10 +1219,10 @@ function search($key, $userid){
 			}
 		}
 	}
-	
-	$query5 = "SELECT media_id FROM usermedia_$username WHERE user_id IN 
+
+	$query5 = "SELECT media_id FROM usermedia_$username WHERE user_id IN
 				(SELECT user_id FROM user WHERE user_name LIKE '%$key%')";
-	$result5 = mysqli_query($conn, $query5);	
+	$result5 = mysqli_query($conn, $query5);
 	if(!$result5){
 		die ("Query5 Failed: ".mysqli_error($conn));
 	}
@@ -1227,7 +1235,7 @@ function search($key, $userid){
 	}
 
 	$query6 = "SELECT media_id FROM usermedia_$username WHERE upload_date LIKE '%$key%'";
-	$result6 = mysqli_query($conn, $query6);	
+	$result6 = mysqli_query($conn, $query6);
 	if(!$result6){
 		die ("Query6 Failed: ".mysqli_error($conn));
 	}
@@ -1238,9 +1246,9 @@ function search($key, $userid){
 			}
 		}
 	}
-	
+
 	$query7 = "SELECT media_id FROM usermedia_$username WHERE keywords LIKE '%$key%'";
-	$result7 = mysqli_query($conn, $query7);	
+	$result7 = mysqli_query($conn, $query7);
 	if(!$result7){
 		die ("Query7 Failed: ".mysqli_error($conn));
 	}
@@ -1251,12 +1259,12 @@ function search($key, $userid){
 			}
 		}
 	}
-	
-	$uniqueMediaId = array_unique($mediaId);	
+        if(is_array($mediaId)){
+	$uniqueMediaId = array_unique($mediaId);
 	$ids = join(',',$uniqueMediaId);
 	
 	$query = "SELECT * FROM usermedia_$username WHERE media_id IN ($ids)";
-	$result = mysqli_query($conn, $query);	
+	$result = mysqli_query($conn, $query);}
 	if(!$result){
 		die ("Query Failed: ".mysqli_error($conn));
 	}
@@ -1270,7 +1278,7 @@ function search($key, $userid){
 function advanceSearch($title, $description, $file_extension, $channelName, $userName, $date, $keyword, $userid){
 	$conn = connect();
 	$username = getUserName($userid);
-	
+
 	if($title != NULL){
 		if($description != NULL){
 			if($file_extension != NULL){
@@ -1455,7 +1463,7 @@ function advanceSearch($title, $description, $file_extension, $channelName, $use
 				}
 			}
 			else{
-				$query = "SELECT * FROM usermedia_$username WHERE 
+				$query = "SELECT * FROM usermedia_$username WHERE
 											 description like '%$description%'";
 								$result = mysqli_query($conn, $query);
 								if(!$result){
@@ -1684,7 +1692,7 @@ function advanceSearch($title, $description, $file_extension, $channelName, $use
 				}
 			}
 		}
-		
+
 	}
 	mysqli_free_result($result);
 	mysqli_close($conn);
@@ -1841,7 +1849,7 @@ function createGroup($name, $description, $userid){
 function getGroup($userId){
 	$conn = connect();
 	$groupId[] = 0;
-	
+
 	$query1 = "SELECT group_id FROM usergroup WHERE administrator = $userId";
 	$result1 = mysqli_query($conn, $query1);
 	if(!$result1){
@@ -1854,7 +1862,7 @@ function getGroup($userId){
 			}
 		}
 	}
-	
+
 	$query2 = "SELECT group_id FROM groupmembers WHERE member_id = $userId";
 	$result2 = mysqli_query($conn, $query2);
 	if(!$result2){
@@ -1867,13 +1875,13 @@ function getGroup($userId){
 			}
 		}
 	}
-	
+
 	if(count($groupId != 0)){
-		$uniqueGroupId = array_unique($groupId);	
+		$uniqueGroupId = array_unique($groupId);
 		$ids = join(',',$uniqueGroupId);
-		
+
 		$query = "SELECT * FROM usergroup WHERE group_id IN ($ids)";
-		$result = mysqli_query($conn, $query);	
+		$result = mysqli_query($conn, $query);
 		if(!$result){
 			die ("Query Failed: ".mysqli_error($conn));
 		}
@@ -1886,7 +1894,7 @@ function getGroup($userId){
 	}
 	mysqli_free_result($result);
 	mysqli_close($conn);
-	
+
 }
 
 function getKeywords(){
@@ -1905,7 +1913,7 @@ function getKeywords(){
 				$keywords[] = $row->keywords;
 			}
 			return $keywords;
-		}	
+		}
 	}
 	mysqli_free_result($result);
 	mysqli_close($conn);
@@ -1913,8 +1921,8 @@ function getKeywords(){
 
 function getContacts($userid){
 	$conn = connect();
-	$query = "SELECT user_name FROM user WHERE 
-				user_id IN (SELECT user_id2 from contacts WHERE user_id1 = $userid) 
+	$query = "SELECT user_name FROM user WHERE
+				user_id IN (SELECT user_id2 from contacts WHERE user_id1 = $userid)
 				OR user_id IN (SELECT user_id2 from friends WHERE user_id1 = $userid)
 				ORDER BY user_id";
 	$result = mysqli_query($conn,$query);
@@ -1930,7 +1938,7 @@ function getContacts($userid){
 
 function addGroupMembers($groupId, $userId){
 	$conn = connect();
-	
+
 	$query = "SELECT * FROM groupmembers WHERE group_id = $groupId AND member_id = $userId";
 	$result = mysqli_query($conn, $query);
 
@@ -1952,31 +1960,31 @@ function addGroupMembers($groupId, $userId){
 			return false;
 		}
 	}
-	
+
 	mysqli_free_result($result);
 	mysqli_close($conn);
 }
 
 function getGroupDetails($groupId){
 	$conn = connect();
-	
+
 	$query = "SELECT * FROM usergroup WHERE group_id = $groupId";
 	$result = mysqli_query($conn, $query);
-	
+
 	if(!$result){
 			die ("Query Failed: ".mysqli_error($conn));
 		}
 	else{
 		return $result;
 	}
-	
+
 	mysqli_free_result($result);
 	mysqli_close($conn);
 }
 
 function getGroupMembers($groupId){
 	$conn = connect();
-	
+
 	$query = "SELECT * FROM groupmembers WHERE group_id = $groupId";
 	$result = mysqli_query($conn, $query);
 	if(!$result){
@@ -1985,7 +1993,7 @@ function getGroupMembers($groupId){
 	else{
 		return $result;
 	}
-	
+
 	mysqli_free_result($result);
 	mysqli_close($conn);
 }
@@ -2056,7 +2064,7 @@ function getGroupName($groupId){
 		else{
 			$value = mysqli_fetch_object($result);
 			return $value->group_name;
-		}		
+		}
 	}
 }
 
@@ -2068,7 +2076,7 @@ function topicComment($topicId){
 			die ("Query Failed: ".mysqli_error($conn));
 		}
 	else{
-		return $result;		
+		return $result;
 	}
 }
 
@@ -2103,30 +2111,30 @@ function removeTopicComment($commentid){
 function getRecommendation($userid){
 	$conn = connect();
 	$username = getUserName($userid);
-	$query = "SELECT * FROM usermedia_$username WHERE 
-				category IN 
+	$query = "SELECT * FROM usermedia_$username WHERE
+				category IN
 					(SELECT max(media_category) FROM history WHERE user_id = $userid)
-				OR category IN 
-					(SELECT max(media_category) FROM history WHERE user_id = $userid AND 
-					media_category NOT IN 
+				OR category IN
+					(SELECT max(media_category) FROM history WHERE user_id = $userid AND
+					media_category NOT IN
 						(SELECT max(media_category) FROM history WHERE user_id = $userid))
-				OR media_id IN 
+				OR media_id IN
 					(SELECT media_id FROM mediarating GROUP BY media_id HAVING avg(rating)>3.0)
-				OR media_id IN 
-					(SELECT media_id FROM usermedia_$username WHERE channel_id IN 
-						(SELECT channel_id FROM usermedia_$username WHERE media_id IN 
-							(SELECT media_id FROM favourites WHERE user_id = $userid)))
-				OR media_id IN 
+				OR media_id IN
 					(SELECT media_id FROM usermedia_$username WHERE channel_id IN
-						(SELECT channel_id FROM usermedia_$username WHERE category IN 
+						(SELECT channel_id FROM usermedia_$username WHERE media_id IN
+							(SELECT media_id FROM favourites WHERE user_id = $userid)))
+				OR media_id IN
+					(SELECT media_id FROM usermedia_$username WHERE channel_id IN
+						(SELECT channel_id FROM usermedia_$username WHERE category IN
 							(SELECT max(media_category) FROM history WHERE user_id = $userid)))
-				OR media_id IN 
-					(SELECT media_id FROM usermedia_$username WHERE user_id IN 
-						(SELECT user_id FROM usermedia_$username WHERE media_id IN 
+				OR media_id IN
+					(SELECT media_id FROM usermedia_$username WHERE user_id IN
+						(SELECT user_id FROM usermedia_$username WHERE media_id IN
 							(SELECT media_id FROM favourites WHERE user_id = $userid)))
-				OR media_id IN 
+				OR media_id IN
 					(SELECT media_id FROM usermedia_$username WHERE channel_id IN
-						(SELECT user_id FROM usermedia_$username WHERE category IN 
+						(SELECT user_id FROM usermedia_$username WHERE category IN
 							(SELECT max(media_category) FROM history WHERE user_id = $userid)))";
 	$result = mysqli_query($conn, $query);
 	if(!$result){
