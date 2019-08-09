@@ -1,0 +1,80 @@
+
+
+/* ==========================================================================
+   Author's custom styles
+   ========================================================================== */
+
+   .button1{
+     border-radius: 4px;
+     background-color: #F66733;
+     border: none;
+     color: #FFFFFF;
+     text-align: center;
+     font-size: 15px;
+     padding: 10px;
+     width: 100px;
+     height: 40px;
+     transition: all 0.5s;
+     cursor: pointer;
+     margin: 5px;
+   }
+
+.button2{
+  border-radius: 4px;
+  background-color: #F66733;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 15px;
+  padding: 10px;
+  width: 100px;
+  height: 50px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button3{
+  border-radius: 4px;
+  background-color: #F66733;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 15px;
+  padding: 10px;
+  width: 160px;
+  height: 50px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 10px;
+}
+
+.button4{
+  border-radius: 4px;
+  background-color: #F66733;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 15px;
+  padding: 10px;
+  width: 100px;
+  height: 50px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
+
+.button5{
+  border-radius: 4px;
+  background-color: #4CBB17;
+  border: none;
+  color: #FFFFFF;
+  text-align: center;
+  font-size: 14px;
+  padding: 10px;
+  width: 60px;
+  height: 40px;
+  transition: all 0.5s;
+  cursor: pointer;
+  margin: 5px;
+}
